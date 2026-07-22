@@ -18,7 +18,7 @@ public class BookingConfig {
     @Bean(name = "flightsWebClient")
     public WebClient flightsWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:9091/flights/api/v1/load-flights")
+                .baseUrl("http://localhost:8080/flights/api/v1/load-flights")
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }
@@ -26,7 +26,7 @@ public class BookingConfig {
     @Bean(name = "offersWebClient")
     public WebClient offersWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:9092/offers/api/v1/load-offers")
+                .baseUrl("http://localhost:8080/offers/api/v1/load-offers")
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }

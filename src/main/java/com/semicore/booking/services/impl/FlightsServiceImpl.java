@@ -1,6 +1,9 @@
 package com.semicore.booking.services.impl;
 
 import com.semicore.booking.services.FlightsService;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
@@ -19,6 +22,7 @@ import java.util.List;
 @Service
 public class FlightsServiceImpl implements FlightsService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlightsServiceImpl.class);
    // @Autowired
    // private RestTemplate restTemplate;
 
@@ -38,8 +42,10 @@ public class FlightsServiceImpl implements FlightsService {
     @Override
     public List<String> fetchFlightsForSelection(){
         List<String> responses = new ArrayList<>();
+        LOGGER.info("Fetching flights and offers for selection...");
         try{
             responses.add(flightsClient.method(HttpMethod.GET).retrieve().body(String.class));
+            Thread.sleep(1000);
             responses.add(offersClient.method(HttpMethod.GET).retrieve().body(String.class));
         }catch (Exception e){
             e.printStackTrace();
