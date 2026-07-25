@@ -1,7 +1,9 @@
 package com.semicore.booking.services.impl;
 
 import com.semicore.booking.services.FlightsService;
-import lombok.extern.slf4j.Slf4j;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +41,32 @@ public class FlightsServiceImpl implements FlightsService {
     @Autowired
     private WebClient flightsWebClient;
 
+    @CircuitBreaker(
+            name = "flightsSelectionService",
+            fallbackMethod = "fallbackFetchFlightsForSelection")
     @Override
     public List<String> fetchFlightsForSelection(){
         List<String> responses = new ArrayList<>();
         LOGGER.info("Fetching flights and offers for selection...");
-        try{
             responses.add(flightsClient.method(HttpMethod.GET).retrieve().body(String.class));
-            Thread.sleep(1000);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             responses.add(offersClient.method(HttpMethod.GET).retrieve().body(String.class));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
         return  responses;
+    }
+
+    /**
+     * The fallback method name can be anything, but the return type must be same as of the original method
+     * and the parameters should match with original method with an extra parameter of type Exception
+     */
+
+    public List<String> fallbackFetchFlightsForSelection(Exception ex) {
+        LOGGER.error("Error occurred while fetching flights for selection", ex);
+        return List.of("Service unavailable : " + ex.getMessage());
     }
 
     /*@Override
